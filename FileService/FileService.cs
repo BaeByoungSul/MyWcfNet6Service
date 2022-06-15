@@ -74,8 +74,6 @@ namespace BBS
             catch (Exception ex)
             {
                 throw new FaultException(ex.ToString());
-
-
             }
         }
         public CheckFileResponse CheckFile(string fileName)

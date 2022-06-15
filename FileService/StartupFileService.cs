@@ -8,6 +8,7 @@ namespace BBS
 {
     public class StartupFileService
     {
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddServiceModelServices()
@@ -23,10 +24,12 @@ namespace BBS
                 basicBinding.TransferMode = TransferMode.Streamed;
                 //basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
                 basicBinding.MaxReceivedMessageSize = 2147483647;
+
                 basicBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.CloseTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.ReceiveTimeout = TimeSpan.FromMinutes(15);
                 basicBinding.SendTimeout = TimeSpan.FromMinutes(15);
+
                 
                 builder.AddServiceEndpoint<FileService, IFileService>(basicBinding, "/FileService");
 
