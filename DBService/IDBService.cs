@@ -14,14 +14,12 @@ namespace BBS
     /// ExecNonQuery(MyCommand[] myCmds) : 서버에서 Transaction 관리
     /// ExecNonQueryWs(MyCommand myCmd): Client에서 Transaction 관리 , .NET 6 지원하지 않아서 삭제
     /// GetDataSetXml(MyCommand myCmd): DB 조회
+    /// 2022.06.16, reliableSession이 되지 않아서 InstanceContextMode.PerSession 가 되지 않네요 
     /// </summary>
 
     [ServiceContract(Namespace = "http://nakdong.wcf.service")]
     public interface IDBService
     {
-        [OperationContract]
-        void SetTransOption(TransactionScopeOption scopeOption);
-
         [OperationContract]
         SvcReturn ExecNonQuery(MyCommand[] myCmds);
 

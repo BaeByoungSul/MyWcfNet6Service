@@ -15,17 +15,20 @@ using System.Xml.Serialization;
 
 namespace BBS
 {
+    
     public class DBService : IDBService
     {
         private const string sOkMsg1 = "Completed successfully";
-        private TransactionScopeOption DbScopeOption { get; set; } = TransactionScopeOption.Required;
         private List<DBOutPut> OutputList { get; set; }= new List<DBOutPut>();
+        public DBService()
+        {
+            Console.WriteLine("DBService Created...");
+        }
         public SvcReturn ExecNonQuery(MyCommand[] myCmds)
         {
             try
             {
-
-                using (TransactionScope scope = new TransactionScope(DbScopeOption))
+                using (TransactionScope scope = new( TransactionScopeOption.Required ))
                 {
                     DBExecManager dBExec = new DBExecManager (myCmds);
 
@@ -189,19 +192,7 @@ namespace BBS
             }
         }
 
-        /// <summary>
-        /// 기본값:  TransactionScopeOption.Required, transaction 처리
-        //          TransactionScopeOption.Suppress, transcation 관리하지 않음
-        /// </summary>
-        /// <param name="scopeOption"></param>
-        public void SetTransOption(TransactionScopeOption scopeOption)
-        {
-            if (scopeOption == TransactionScopeOption.RequiresNew)
-            {
-                throw new Exception("해당 Transaction Scope는 적용되지 않습니다.");
-            }
-            DbScopeOption = scopeOption;
-        }
+        
     }
 
     /// <summary>

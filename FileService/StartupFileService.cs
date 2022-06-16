@@ -22,7 +22,7 @@ namespace BBS
 
                 var basicBinding = new BasicHttpBinding();
                 basicBinding.TransferMode = TransferMode.Streamed;
-                //basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
+//                basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
                 basicBinding.MaxReceivedMessageSize = 2147483647;
 
                 basicBinding.OpenTimeout = TimeSpan.FromMinutes(5);
@@ -32,7 +32,6 @@ namespace BBS
 
                 
                 builder.AddServiceEndpoint<FileService, IFileService>(basicBinding, "/FileService");
-
 
                 var nettcpBinding = new NetTcpBinding();
                 nettcpBinding.TransferMode = TransferMode.Streamed;
@@ -45,6 +44,7 @@ namespace BBS
                 nettcpBinding.Security.Mode = SecurityMode.None;
 
                 builder.AddServiceEndpoint<FileService, IFileService>(nettcpBinding, "/FileService");
+
 
 
                 var serviceMetadataBehavior = app.ApplicationServices.GetRequiredService<CoreWCF.Description.ServiceMetadataBehavior>();

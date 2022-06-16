@@ -34,13 +34,12 @@ namespace BBS
             host.UseKestrel(option =>
             {
                 option.AllowSynchronousIO = true;
-                 //option.ListenLocalhost(9110);
                  option.Listen(IPAddress.Parse(_ipAddress), 9110);
                 //option.Listen(IPAddress.Parse("172.20.105.36"), 9110);
                 //option.Listen(IPAddress.Parse("172.20.105.36"), 9130);
             });
-            host.UseNetTcp(IPAddress.Loopback, 9120);
-            //host.UseNetTcp(IPAddress.Parse("172.20.105.36"), 9120);
+            //host.UseNetTcp(IPAddress.Loopback, 9120);
+            host.UseNetTcp(IPAddress.Parse(_ipAddress), 9120);
             host.UseStartup<StartupDBService>();
 
             return host;
