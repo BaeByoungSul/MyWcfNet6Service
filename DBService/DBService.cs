@@ -89,12 +89,14 @@ namespace BBS
             int iCol = 0;
             foreach (IDbDataParameter para in dbCommand.Parameters)
             {
-                if (para.Direction == ParameterDirection.InputOutput) continue;
-                if (para.Direction == ParameterDirection.Output) continue;
-
-                // 조회는 한번의 첫 번째 파라미터 셋트만 실행
-                para.Value = myCmd?.ParaValues?[iSetSeq][iCol].ParaValue;
+                // 파라미터가  input,  InputOutput일 경우 값을 저장
+                if (para.Direction == ParameterDirection.Input ||
+                    para.Direction == ParameterDirection.InputOutput )
+                {
+                    para.Value = myCmd?.ParaValues?[iSetSeq][iCol].ParaValue;
+                }
                 iCol++;
+
             }
             // Header 값 참조 파라미터 값 설정
             foreach (MyPara para in myCmd.Parameters ?? Enumerable.Empty<MyPara>())
@@ -110,17 +112,14 @@ namespace BBS
                                                  .FirstOrDefault(x => x.CommandName == para.HeaderCommandName &&
                                                                       x.ParameterName == para.ParameterName);
 
-                    if (output == null)
-                    {
-                        throw new Exception("There is nothing to refer header output value");
-                    }
-
+                    if (output == null) throw new Exception("There is nothing to refer header output value");
+                    
                     ((IDbDataParameter)dbCommand.Parameters[para.ParameterName]).Value = output.OutValue;
 
                 }
             }
-
         } //SetParaValue
+
         private void ListAddOutput(IDbCommand dbCommand, string myCmdName)
         {
             try
@@ -310,6 +309,8 @@ namespace BBS
                     dbCommand.Connection = conn;
                     dbCommand.CommandType = (CommandType)myCmd.CommandType;
                     dbCommand.CommandText = myCmd.CommandText;
+                    if (settings.ProviderName.Equals("Oracle.ManagedDataAccess.Client"))
+                        ((OracleCommand)dbCommand).BindByName = true;
 
                     DicDBCmd.Add(myCmd, dbCommand);
 
