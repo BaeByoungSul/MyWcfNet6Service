@@ -29,7 +29,6 @@ namespace BBS
                 basicBinding.CloseTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.ReceiveTimeout = TimeSpan.FromMinutes(15);
                 basicBinding.SendTimeout = TimeSpan.FromMinutes(15);
-
                 
                 builder.AddServiceEndpoint<FileService, IFileService>(basicBinding, "/FileService");
 
@@ -37,6 +36,7 @@ namespace BBS
                 nettcpBinding.TransferMode = TransferMode.Streamed;
                 nettcpBinding.Security.Mode = SecurityMode.None;
                 nettcpBinding.MaxReceivedMessageSize = 2147483647;
+
                 nettcpBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 nettcpBinding.CloseTimeout = TimeSpan.FromMinutes(5);
                 nettcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(15);
