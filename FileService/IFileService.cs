@@ -36,7 +36,7 @@ namespace BBS
     }
 
     [MessageContract]
-    public class FileData : IDisposable
+    public class FileData   : IDisposable
     {
         [MessageHeader]
         public string FileName { get; set; }=string.Empty ;
@@ -45,12 +45,13 @@ namespace BBS
         public long FileLength { get; set; }
 
         [MessageBodyMember(Order = 1)]
-        public Stream? Stream { get; set; }
+        public Stream? MyStream { get; set; }
 
         public void Dispose()
         {
-            if (Stream == null) return;
-            Stream.Close();
+            if (MyStream == null) return;
+            MyStream.Close();
+            MyStream = null;
             GC.SuppressFinalize(this);
         }
 

@@ -26,8 +26,9 @@ namespace BBS
         }
         public static IWebHostBuilder CreateWebHost(string[] args)
         {
-            // 730 MB
-            const int maxRequestLimit = 737280000;
+            // 830 MB
+            //const int maxRequestLimit = 837280000;
+            const int maxRequestLimit = 1048576000; 
             string _ipAddress = args[0];
             var host = WebHost.CreateDefaultBuilder(args);
             host.UseKestrel(option =>

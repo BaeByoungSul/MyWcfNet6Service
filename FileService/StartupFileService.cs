@@ -12,7 +12,8 @@ namespace BBS
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddServiceModelServices()
-                    .AddServiceModelMetadata(); ;
+                    .AddServiceModelMetadata()  ;
+
         }
         public void Configure(IApplicationBuilder app)
         {
@@ -22,8 +23,9 @@ namespace BBS
 
                 var basicBinding = new BasicHttpBinding();
                 basicBinding.TransferMode = TransferMode.Streamed;
-//                basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
+                basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
                 basicBinding.MaxReceivedMessageSize = 2147483647;
+                basicBinding.MaxBufferSize = 65536;
 
                 basicBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.CloseTimeout = TimeSpan.FromMinutes(5);
@@ -36,12 +38,13 @@ namespace BBS
                 nettcpBinding.TransferMode = TransferMode.Streamed;
                 nettcpBinding.Security.Mode = SecurityMode.None;
                 nettcpBinding.MaxReceivedMessageSize = 2147483647;
+                
 
                 nettcpBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 nettcpBinding.CloseTimeout = TimeSpan.FromMinutes(5);
                 nettcpBinding.ReceiveTimeout = TimeSpan.FromMinutes(15);
                 nettcpBinding.SendTimeout = TimeSpan.FromMinutes(15);
-                nettcpBinding.Security.Mode = SecurityMode.None;
+                
 
                 builder.AddServiceEndpoint<FileService, IFileService>(nettcpBinding, "/FileService");
 
