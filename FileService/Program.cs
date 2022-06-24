@@ -14,37 +14,59 @@ namespace BBS
          /// <param name="args"></param>
         static void Main(string[] args)
         {
+            string[] strHostIp = new string[1];
+#if DEBUG
+            strHostIp[0] = "127.0.0.1";
+#else // Release
             if (args.Length <= 0)
             {
                 Console.WriteLine("Input Server IP Address");
-                return; 
+                return;
             }
             Console.WriteLine(args[0]);
-            IWebHost host = CreateWebHost(args).Build();
-            host.Run();
+            strHostIp[0] = args[0];
+#endif
+
+            try
+            {
+                IWebHost host = CreateWebHost(strHostIp).Build();
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+
+            }
 
         }
         public static IWebHostBuilder CreateWebHost(string[] args)
         {
             // 830 MB
             //const int maxRequestLimit = 837280000;
-            const int maxRequestLimit = 1048576000; 
-            string _ipAddress = args[0];
-            var host = WebHost.CreateDefaultBuilder(args);
-            host.UseKestrel(option =>
+            const int maxRequestLimit = 1048576000;
+
+            try
             {
-                option.AllowSynchronousIO = true;
-                option.Limits.MaxRequestBodySize = maxRequestLimit;
+                IPAddress address = IPAddress.Parse(args[0]);
+                var host = WebHost.CreateDefaultBuilder();
+                host.UseKestrel(option =>
+                {
+                    option.AllowSynchronousIO = true;
+                    option.Limits.MaxRequestBodySize = maxRequestLimit;
 
-                option.Listen(IPAddress.Parse(_ipAddress), 9210);
-                //option.Listen(IPAddress.Parse("172.20.105.36"), 9210);
-                //option.Listen(IPAddress.Parse("172.20.105.36"), 9130);
-            });
-            //host.UseNetTcp(IPAddress.Loopback, 9220);
-            host.UseNetTcp(IPAddress.Parse(_ipAddress), 9220);
-            host.UseStartup<StartupFileService>();
+                    option.Listen(address, 9210);
+                    //option.Listen(IPAddress.Parse("172.20.105.36"), 9210);
+                });
+                host.UseNetTcp(address, 9220);
+                host.UseStartup<StartupFileService>();
 
-            return host;
+                return host;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+           
 
         }
 

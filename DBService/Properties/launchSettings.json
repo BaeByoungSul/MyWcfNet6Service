@@ -1,8 +1,7 @@
 {
   "profiles": {
     "DBService": {
-      "commandName": "Project",
-      "commandLineArgs": "127.0.0.1"
+      "commandName": "Project"
     }
   }
 }

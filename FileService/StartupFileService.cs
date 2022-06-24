@@ -17,6 +17,8 @@ namespace BBS
         }
         public void Configure(IApplicationBuilder app)
         {
+            //app.UseDeveloperExceptionPage();
+            
             app.UseServiceModel(builder => 
             {
                 builder.AddService<FileService>();
@@ -26,6 +28,12 @@ namespace BBS
                 basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
                 basicBinding.MaxReceivedMessageSize = 2147483647;
                 basicBinding.MaxBufferSize = 65536;
+
+                //basicBinding.ReaderQuotas.MaxStringContentLength = 2147483647;
+                //basicBinding.ReaderQuotas.MaxBytesPerRead = 2147483647;
+                //basicBinding.ReaderQuotas.MaxArrayLength = 2147483647;
+                //basicBinding.ReaderQuotas.MaxNameTableCharCount = 2147483647;
+                //basicBinding.ReaderQuotas.MaxDepth = 2147483647;
 
                 basicBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.CloseTimeout = TimeSpan.FromMinutes(5);
@@ -38,7 +46,8 @@ namespace BBS
                 nettcpBinding.TransferMode = TransferMode.Streamed;
                 nettcpBinding.Security.Mode = SecurityMode.None;
                 nettcpBinding.MaxReceivedMessageSize = 2147483647;
-                
+                nettcpBinding.MaxBufferSize = 65536;
+
 
                 nettcpBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 nettcpBinding.CloseTimeout = TimeSpan.FromMinutes(5);

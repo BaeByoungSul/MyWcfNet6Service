@@ -19,6 +19,10 @@ namespace BBS
     public class DBService : IDBService
     {
         private const string sOkMsg1 = "Completed successfully";
+        
+        /// <summary>
+        /// DB Output List
+        /// </summary>
         private List<DBOutPut> OutputList { get; set; }= new List<DBOutPut>();
         public DBService()
         {
@@ -49,6 +53,7 @@ namespace BBS
 
                         // Parameter가 있을 경우
                         int iValeuSetCnt = myCmd.ParaValues.Length;
+                        
                         // 한개의 db command별로 여러번 실행, 
                         for (int iSetCnt = 0; iSetCnt < iValeuSetCnt; iSetCnt++)
                         {
@@ -75,11 +80,15 @@ namespace BBS
             {
                 ReturnCD = "OK",
                 ReturnMsg = sOkMsg1,
-                ReturnStr = CreateManager.ToXML(OutputList, "Result_Ds")
+                ReturnStr = MyDbStatic.ToXML(OutputList, "Result_Ds")
             };
             return rtnData;
 
         }
+
+        /// <summary>
+        /// ExecNonQuery 실행 전 parameter Value처리
+        /// </summary>
         private void SetParaValue(IDbCommand dbCommand, MyCommand myCmd, int iSetSeq)
         {
             if (dbCommand.Parameters == null) return;
@@ -115,17 +124,20 @@ namespace BBS
                     if (output == null) throw new Exception("There is nothing to refer header output value");
                     
                     ((IDbDataParameter)dbCommand.Parameters[para.ParameterName]).Value = output.OutValue;
-
                 }
             }
         } //SetParaValue
 
+        /// <summary>
+        /// DB ExecNonQuery 실행 후 필요한 파라미터 저장
+        /// output,InputOutput, return value 저장
+        /// </summary>
+        /// <param name="dbCommand"></param>
+        /// <param name="myCmdName"></param>
         private void ListAddOutput(IDbCommand dbCommand, string myCmdName)
         {
             try
             {
-                // output value 처리
-                // 실행 후 command 파라미터의 output, return value 저장
                 foreach (IDbDataParameter param in dbCommand.Parameters)
                 {
                     if (param.Direction == ParameterDirection.Output ||
@@ -135,7 +147,7 @@ namespace BBS
 
                         DBOutPut rtnData = new()
                         {
-                            Rowseq = OutputList.Count() + 1,
+                            Rowseq = OutputList.Count + 1,
                             CommandName = myCmdName,
                             ParameterName = param.ParameterName.Trim(),
                             OutValue = param.Value?.ToString() ?? String.Empty
@@ -143,7 +155,6 @@ namespace BBS
 
                         OutputList.Add(rtnData);
                         Console.WriteLine(rtnData);
-
                     }
                 }
 
@@ -191,7 +202,6 @@ namespace BBS
             }
         }
 
-        
     }
 
     /// <summary>
@@ -210,7 +220,7 @@ namespace BBS
             {
                 DbConnSettings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
                 // Create DB Connection 
-                DbConn = CreateManager.CreateConnection(DbConnSettings) ?? throw new Exception("Db Connection Error ");
+                DbConn = MyDbStatic.CreateConnection(DbConnSettings) ?? throw new Exception("Db Connection Error ");
 
                 DbConn.Open();
 
@@ -226,7 +236,7 @@ namespace BBS
                     if (string.IsNullOrEmpty(myCmd.Parameters[i].ParameterName)) break;
                     if (string.IsNullOrWhiteSpace(myCmd.Parameters[i].ParameterName)) break;
 
-                    IDbDataParameter? dbDataParameter = CreateManager.CreateParameter(myCmd.Parameters[i], DbConnSettings.ProviderName);
+                    IDbDataParameter? dbDataParameter = MyDbStatic.CreateParameter(myCmd.Parameters[i], DbConnSettings.ProviderName);
 
                     if (dbDataParameter == null) throw new Exception("Create DB Parameter Fail");
                     DbCmd.Parameters.Add(dbDataParameter);
@@ -248,7 +258,7 @@ namespace BBS
                 if (DbConnSettings == null) throw new Exception("DB Fill Manager DB Connection string Error");
                 
                 // DB Adapter
-                IDataAdapter? dbAdapter = CreateManager.CreateDbAdapter(dbCommand, DbConnSettings.ProviderName);
+                IDataAdapter? dbAdapter = MyDbStatic.CreateDbAdapter(dbCommand, DbConnSettings.ProviderName);
 
                 if (dbAdapter == null) throw new Exception("Create DB Adapter Fail");
 
@@ -290,7 +300,7 @@ namespace BBS
                     if (DicDBConn.ContainsKey(myCmd.ConnectionName)) continue;
 
                     ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
-                    IDbConnection? dbconnection = CreateManager.CreateConnection(settings);
+                    IDbConnection? dbconnection = MyDbStatic.CreateConnection(settings);
 
                     // DB 연결을 만들지 못하면 Exception처리 
                     if (dbconnection == null) throw new Exception("Create DB Connection Fail");
@@ -322,7 +332,7 @@ namespace BBS
                         if (string.IsNullOrEmpty(myCmd.Parameters[i].ParameterName)) break;
                         if (string.IsNullOrWhiteSpace(myCmd.Parameters[i].ParameterName)) break;
 
-                        IDbDataParameter? dbDataParameter = CreateManager.CreateParameter(myCmd.Parameters[i], settings.ProviderName);
+                        IDbDataParameter? dbDataParameter = MyDbStatic.CreateParameter(myCmd.Parameters[i], settings.ProviderName);
                         if (dbDataParameter == null) throw new Exception("Create DB Parameter Fail");
                         dbCommand.Parameters.Add(dbDataParameter);
                     }
@@ -338,7 +348,7 @@ namespace BBS
         }
         
     }
-    public static class CreateManager
+    public static class MyDbStatic
     {
         public static IDbConnection? CreateConnection(ConnectionStringSettings settings)
         {

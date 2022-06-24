@@ -12,6 +12,7 @@ namespace BBS
     /// DownloadFile: Server To Client로 File Stream 전송
     /// UploadFile : Client To Server로 File Stream 전송
     /// CheckFile : 서버에 파일이 있는지 ? 있어면 파일버전은 ?
+    /// Task가 필요한지 ?
     /// </summary>
     [ServiceContract]
     public interface IFileService
@@ -25,6 +26,14 @@ namespace BBS
 
         [OperationContract]
         CheckFileResponse CheckFile(string fileName);
+
+        //[OperationContract]
+        //Task UploadFileMyAsync(FileData uploadFile);
+
+        //[OperationContract]
+        //Task<FileData> DownloadFileMyAsync(DownloadRequest request);
+
+
 
     }
     [MessageContract]
