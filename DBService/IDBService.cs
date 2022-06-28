@@ -119,6 +119,13 @@ namespace BBS
             ReturnMsg = String.Empty;
             ReturnStr = String.Empty;
         }
+        public SvcReturn(string returnCD, string returnMsg, string returnStr)
+        {
+            ReturnCD = returnCD;
+            ReturnMsg = returnMsg;
+            ReturnStr = returnStr;
+        }
+
         [DataMember(Order = 0)]
         public string ReturnCD { get; set; }  // "FAIL", "OK"
 

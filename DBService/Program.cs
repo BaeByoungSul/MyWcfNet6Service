@@ -50,6 +50,7 @@ namespace BBS
             {
                 IPAddress address = IPAddress.Parse(args[0]);
                 var host = WebHost.CreateDefaultBuilder();
+
                 host.UseKestrel(option =>
                 {
                     option.AllowSynchronousIO = true;

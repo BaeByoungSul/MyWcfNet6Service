@@ -68,7 +68,8 @@ namespace BBS
                     // commit commands
                     scope.Complete();
                 } // end using transactionscope
-                
+               
+
             }
             catch (Exception ex)
             {
@@ -76,13 +77,30 @@ namespace BBS
                 throw new FaultException(ex.Message); 
             }
 
-            SvcReturn rtnData = new()
-            {
-                ReturnCD = "OK",
-                ReturnMsg = sOkMsg1,
-                ReturnStr = MyDbStatic.ToXML(OutputList, "Result_Ds")
-            };
+            //string str = MyDbStatic.ToXML(OutputList, "Result_Ds");
+
+            //return new SvcReturn
+            //{
+            //    ReturnCD = "OK",
+            //    ReturnMsg = sOkMsg1,
+            //    ReturnStr = str
+            //};
+            string xmlString = MyDbStatic.ToXML(OutputList, "Result_Ds");
+            SvcReturn rtnData = new SvcReturn("OK",sOkMsg1, xmlString);
+
             return rtnData;
+
+            //rtnData.ReturnCD = "OK";
+            //rtnData.ReturnMsg = sOkMsg1;
+            //rtnData.ReturnStr = MyDbStatic.ToXML(OutputList, "Result_Ds");
+            ////SvcReturn rtnData = new()
+            ////{
+            ////    ReturnCD = "OK",
+            ////    ReturnMsg = sOkMsg1,
+            ////    ReturnStr = MyDbStatic.ToXML(OutputList, "Result_Ds")
+            ////};
+            //return rtnData;
+
 
         }
 

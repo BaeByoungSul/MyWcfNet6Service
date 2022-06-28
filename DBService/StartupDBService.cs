@@ -19,6 +19,7 @@ namespace BBS
         /// <param name="app"></param>
         public void Configure(IApplicationBuilder app)
         {
+           
             app.UseServiceModel(builder => 
             {
                 builder.AddService<DBService>();
