@@ -15,6 +15,9 @@ namespace BBS
         }
         /// <summary>
         /// NetTcpBinding: reliableSession 이 적용되지 않음( 2022.06.16 )
+        /// Mtom 일 때 아래 메세지가 나타나서 제외함 
+        /// the application completed without reading the entire request body
+        ///  
         /// </summary>
         /// <param name="app"></param>
         public void Configure(IApplicationBuilder app)
@@ -26,8 +29,9 @@ namespace BBS
 
                 var basicBinding = new BasicHttpBinding();
                 basicBinding.TransferMode = TransferMode.Streamed;
-                basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
+                //basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
                 basicBinding.MaxReceivedMessageSize = 2147483647;
+
                 basicBinding.OpenTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.CloseTimeout = TimeSpan.FromMinutes(5);
                 basicBinding.ReceiveTimeout = TimeSpan.FromMinutes(15);

@@ -31,12 +31,11 @@ namespace BBS
     [DataContract]
     public class MyCommand
     {
-        public MyCommand(string commandName, string connectionName, int commandType, string commandText)
+        public MyCommand()
         {
-            CommandName = commandName;
-            ConnectionName = connectionName;
-            CommandType = commandType;
-            CommandText = commandText;
+            CommandName = string.Empty;
+            ConnectionName = string.Empty;
+            CommandText = string.Empty;
         }
 
         [DataMember(Order = 0, IsRequired = true)]
@@ -52,8 +51,9 @@ namespace BBS
         public MyPara[]? Parameters { get; set; }
 
         [DataMember(Order = 5)]
-        public MyParaValue[][]? ParaValues { get; set; } 
+        public MyParaValue[][]? ParaValues { get; set; }
     }
+
     [DataContract]
     public class MyPara
     {
@@ -63,15 +63,6 @@ namespace BBS
             HeaderCommandName = String.Empty;
             HeaderParameter = String.Empty;
         }
-        public MyPara(string parameterName, int dbDataType, int direction, string headerCommandName = "", string headerParameter = "")
-        {
-            ParameterName = parameterName;
-            DbDataType = dbDataType;
-            Direction = direction;
-            HeaderCommandName = headerCommandName;
-            HeaderParameter = headerParameter;
-        }
-
         [DataMember(Order = 0)]
         public string ParameterName { get; set; }
         [DataMember(Order = 1)]
@@ -91,11 +82,6 @@ namespace BBS
         {
             ParameterName = String.Empty;
             ParaValue =String.Empty;
-        }
-        public MyParaValue(string parameterName, string paraValue)
-        {
-            ParameterName = parameterName;
-            ParaValue = paraValue;
         }
 
         [DataMember(Order = 0)]

@@ -25,7 +25,7 @@ namespace BBS
 
                 var basicBinding = new BasicHttpBinding();
                 basicBinding.TransferMode = TransferMode.Streamed;
-                basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
+                //basicBinding.MessageEncoding = WSMessageEncoding.Mtom;
                 basicBinding.MaxReceivedMessageSize = 2147483647;
                 basicBinding.MaxBufferSize = 65536;
 

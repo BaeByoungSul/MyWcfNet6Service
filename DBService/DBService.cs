@@ -77,29 +77,14 @@ namespace BBS
                 throw new FaultException(ex.Message); 
             }
 
-            //string str = MyDbStatic.ToXML(OutputList, "Result_Ds");
-
-            //return new SvcReturn
-            //{
-            //    ReturnCD = "OK",
-            //    ReturnMsg = sOkMsg1,
-            //    ReturnStr = str
-            //};
             string xmlString = MyDbStatic.ToXML(OutputList, "Result_Ds");
-            SvcReturn rtnData = new SvcReturn("OK",sOkMsg1, xmlString);
 
-            return rtnData;
-
-            //rtnData.ReturnCD = "OK";
-            //rtnData.ReturnMsg = sOkMsg1;
-            //rtnData.ReturnStr = MyDbStatic.ToXML(OutputList, "Result_Ds");
-            ////SvcReturn rtnData = new()
-            ////{
-            ////    ReturnCD = "OK",
-            ////    ReturnMsg = sOkMsg1,
-            ////    ReturnStr = MyDbStatic.ToXML(OutputList, "Result_Ds")
-            ////};
-            //return rtnData;
+            return new SvcReturn
+            {
+                ReturnCD = "OK",
+                ReturnMsg = sOkMsg1,
+                ReturnStr = xmlString
+            };
 
 
         }
@@ -137,7 +122,7 @@ namespace BBS
 
                     DBOutPut? output = OutputList.OrderByDescending(x => x.Rowseq)
                                                  .FirstOrDefault(x => x.CommandName == para.HeaderCommandName &&
-                                                                      x.ParameterName == para.ParameterName);
+                                                                      x.ParameterName == para.HeaderParameter);
 
                     if (output == null) throw new Exception("There is nothing to refer header output value");
                     
