@@ -190,6 +190,8 @@ namespace BBS
                 }
 
                 string  xmlString = dBFill.ExecDBFill(dBFill.DbCmd);
+
+                dBFill.Close();
                 
                 return new SvcReturn {
                     ReturnCD = "OK",
@@ -268,6 +270,7 @@ namespace BBS
                 // DB Command exec 
                 DataSet? ds = new("Result_Ds");
                 dbAdapter.Fill(ds);
+                
 
                 // 쿼리 데이터셋 to Xml string  
                 System.IO.StringWriter writer = new();
@@ -286,6 +289,14 @@ namespace BBS
        
         }
 
+        public void Close()
+        {
+
+            DbCmd?.Dispose();
+            DbConn?.Close();
+            DbConn?.Dispose();
+
+        }
     }// class end
 
     public class DBExecManager
