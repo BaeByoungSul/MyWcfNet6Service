@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace BBS
+namespace BBS.WCF
 {
     /// <summary>
     /// SetTransOption :  ExecNonQuery에서 사용할 TransactionScopeOption
@@ -25,7 +25,9 @@ namespace BBS
 
         [OperationContract]
         SvcReturn GetDataSetXml(MyCommand myCmd);
-    }
+        
+      }
+
 
 
     [DataContract]

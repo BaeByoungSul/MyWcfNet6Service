@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using BBS.WCF;
 using CoreWCF.Configuration;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -54,10 +55,11 @@ namespace BBS
                 host.UseKestrel(option =>
                 {
                     option.AllowSynchronousIO = true;
-                    option.Listen(address, 9110);
-                    //option.Listen(IPAddress.Parse("172.20.105.36"), 9110);
+                    //option.Listen(address, 9110);
+                    option.Listen(IPAddress.Parse("172.20.105.36"), 9110);
                 });
-                host.UseNetTcp(address, 9120);
+                //host.UseNetTcp(address, 9120);
+                host.UseNetTcp(IPAddress.Parse("172.20.105.36"), 9120);
                 host.UseStartup<StartupDBService>();
 
                 return host;
