@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BBS
+namespace BBS.WCF
 {
     /// <summary>
     /// DownloadFile: Server To Client로 File Stream 전송

@@ -1,7 +1,7 @@
 ﻿using CoreWCF.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using BBS;
+using BBS.WCF;
 using CoreWCF;
 
 namespace BBS
