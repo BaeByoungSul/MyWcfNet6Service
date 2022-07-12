@@ -1,6 +1,5 @@
 ﻿using CoreWCF;
 using CoreWCF.Channels;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using Oracle.ManagedDataAccess.Client;
 using System;
@@ -124,9 +123,6 @@ public class DBService : IDBService
                 para.Direction == ParameterDirection.InputOutput )
             {
                 para.Value = myCmd?.ParaValues?[iSetSeq][iCol].ParaValue;
-                
-                // 2022.07.11 추가 : parameter value = null 실행 시 오류가 남
-                if (para.Value == null) para.Value = System.DBNull.Value;
             }
             iCol++;
 
@@ -239,7 +235,7 @@ public class DBService : IDBService
 /// </summary>
 public class DBFillManager
 {
-    private ConnectDB ConnectValue { get; set; }
+    private ConnectionStringSettings? DbConnSettings { get; set; } // = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
     private IDbConnection? DbConn { get; set; }
 
     public IDbCommand? DbCmd { get; set; }
@@ -248,14 +244,9 @@ public class DBFillManager
     {
         try
         {
-            string strSection = "MyConnectionStrings:"+myCmd.ConnectionName;
-
-            if (Program.MyConfiguration == null) throw new Exception("Configuration Error ");
-
-            ConnectValue = Program.MyConfiguration.GetSection(strSection).Get<ConnectDB>();
-            
+            DbConnSettings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
             // Create DB Connection 
-            DbConn = MyDbStatic.CreateConnection(ConnectValue) ?? throw new Exception("Db Connection Error ");
+            DbConn = MyDbStatic.CreateConnection(DbConnSettings) ?? throw new Exception("Db Connection Error ");
 
             DbConn.Open();
 
@@ -271,7 +262,7 @@ public class DBFillManager
                 if (string.IsNullOrEmpty(myCmd.Parameters[i].ParameterName)) break;
                 if (string.IsNullOrWhiteSpace(myCmd.Parameters[i].ParameterName)) break;
 
-                IDbDataParameter? dbDataParameter = MyDbStatic.CreateParameter(myCmd.Parameters[i], ConnectValue.ProviderName);
+                IDbDataParameter? dbDataParameter = MyDbStatic.CreateParameter(myCmd.Parameters[i], DbConnSettings.ProviderName);
 
                 if (dbDataParameter == null) throw new Exception("Create DB Parameter Fail");
                 DbCmd.Parameters.Add(dbDataParameter);
@@ -290,10 +281,10 @@ public class DBFillManager
 
         try
         {
-            if (ConnectValue == null) throw new Exception("DB Fill Manager DB Connection string Error");
+            if (DbConnSettings == null) throw new Exception("DB Fill Manager DB Connection string Error");
                 
             // DB Adapter
-            IDataAdapter? dbAdapter = MyDbStatic.CreateDbAdapter(dbCommand, ConnectValue.ProviderName);
+            IDataAdapter? dbAdapter = MyDbStatic.CreateDbAdapter(dbCommand, DbConnSettings.ProviderName);
 
             if (dbAdapter == null) throw new Exception("Create DB Adapter Fail");
 
@@ -327,8 +318,6 @@ public class DBFillManager
         DbConn?.Dispose();
 
     }
-
-
 }// class end
 
 public class DBExecManager
@@ -345,14 +334,8 @@ public class DBExecManager
                 // 해당 연결이 있어면 Skip
                 if (DicDBConn.ContainsKey(myCmd.ConnectionName)) continue;
 
-                //ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
-
-                string strSection = "MyConnectionStrings:" + myCmd.ConnectionName;
-                if (Program.MyConfiguration == null) throw new Exception("Configuration Error ");
-                ConnectDB connectValue = Program.MyConfiguration.GetSection(strSection).Get<ConnectDB>();
-
-
-                IDbConnection? dbconnection = MyDbStatic.CreateConnection(connectValue);
+                ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
+                IDbConnection? dbconnection = MyDbStatic.CreateConnection(settings);
 
                 // DB 연결을 만들지 못하면 Exception처리 
                 if (dbconnection == null) throw new Exception("Create DB Connection Fail");
@@ -364,19 +347,14 @@ public class DBExecManager
             // Create DB Command
             foreach (MyCommand myCmd in myCmds)
             {
-//                ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
-                string strSection = "MyConnectionStrings:" + myCmd.ConnectionName;
-                if (Program.MyConfiguration == null) throw new Exception("Configuration Error ");
-                ConnectDB connectValue = Program.MyConfiguration.GetSection(strSection).Get<ConnectDB>();
-
+                ConnectionStringSettings settings = ConfigurationManager.ConnectionStrings[myCmd.ConnectionName];
                 IDbConnection conn = DicDBConn[myCmd.ConnectionName];
 
                 IDbCommand dbCommand = conn.CreateCommand();
                 dbCommand.Connection = conn;
                 dbCommand.CommandType = (CommandType)myCmd.CommandType;
                 dbCommand.CommandText = myCmd.CommandText;
-                
-                if (connectValue.ProviderName.Equals("Oracle.ManagedDataAccess.Client"))
+                if (settings.ProviderName.Equals("Oracle.ManagedDataAccess.Client"))
                     ((OracleCommand)dbCommand).BindByName = true;
 
                 DicDBCmd.Add(myCmd, dbCommand);
@@ -389,7 +367,7 @@ public class DBExecManager
                     if (string.IsNullOrEmpty(myCmd.Parameters[i].ParameterName)) break;
                     if (string.IsNullOrWhiteSpace(myCmd.Parameters[i].ParameterName)) break;
 
-                    IDbDataParameter? dbDataParameter = MyDbStatic.CreateParameter(myCmd.Parameters[i], connectValue.ProviderName);
+                    IDbDataParameter? dbDataParameter = MyDbStatic.CreateParameter(myCmd.Parameters[i], settings.ProviderName);
                     if (dbDataParameter == null) throw new Exception("Create DB Parameter Fail");
                     dbCommand.Parameters.Add(dbDataParameter);
                 }
@@ -407,14 +385,15 @@ public class DBExecManager
 }
 public static class MyDbStatic
 {
-    public static IDbConnection? CreateConnection(ConnectDB connectVal)
+    public static IDbConnection? CreateConnection(ConnectionStringSettings settings)
     {
-        if (connectVal.ProviderName.Equals("System.Data.SqlClient"))
-            return new SqlConnection(connectVal.ConnectionString);
-        else if (connectVal.ProviderName.Equals("Oracle.ManagedDataAccess.Client"))
-            return new OracleConnection(connectVal.ConnectionString);
-        else if (connectVal.ProviderName.Equals("MySql.Data.MySqlClient"))
-            return new MySqlConnection(connectVal.ConnectionString);
+
+        if (settings.ProviderName.Equals("System.Data.SqlClient"))
+            return new SqlConnection(settings.ConnectionString);
+        else if (settings.ProviderName.Equals("Oracle.ManagedDataAccess.Client"))
+            return new OracleConnection(settings.ConnectionString);
+        else if (settings.ProviderName.Equals("MySql.Data.MySqlClient"))
+            return new MySqlConnection(settings.ConnectionString);
         else
             return null;
     }
@@ -481,5 +460,3 @@ public static class MyDbStatic
     }
 
 }
-
-

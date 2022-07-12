@@ -1,15 +1,27 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using BBS.WCF;
-using CoreWCF.Configuration;
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System.Net;
+using CoreWCF.Configuration;
 
-namespace BBS
+
+//using BBS.WCF;
+//using CoreWCF.Configuration;
+//using Microsoft.AspNetCore;
+//using Microsoft.AspNetCore.Hosting;
+//using System.Net;
+
+namespace BBS.WCF
 {
+    
     partial class Program
     {
+        //public static IConfigurationRoot? Configuration { get; set; }
+        public static IConfiguration? MyConfiguration { get; set; }
+
         /// <summary>
         /// Project Property > Debug Tab > input argument address
         /// https 및 basic confide
@@ -17,22 +29,16 @@ namespace BBS
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            string[] strHostIp = new string[1];
-
-#if DEBUG
-            strHostIp[0] = "127.0.0.1";
-#else // Release
-            if (args.Length <= 0)
-            {
-                Console.WriteLine("Input Server IP Address");
-                return;
-            }
-            Console.WriteLine(args[0]);
-            strHostIp[0] = args[0];
-#endif
             try
             {
-                IWebHost host = CreateWebHost(strHostIp).Build();
+
+                MyConfiguration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)?.FullName)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+                if (MyConfiguration == null) throw new Exception("Configuration Builder Error");
+
+                IWebHost host = CreateWebHost(args).Build();
                 host.Run();
             }
             catch (Exception ex)
@@ -46,22 +52,32 @@ namespace BBS
 
         public static IWebHostBuilder CreateWebHost(string[] args)
         {
-            
+   
+            string hostingIPAddr = string.Empty;
+            string hostingHttpPort = string.Empty;
+            string hostingTcpPost = string.Empty;
+
+            hostingIPAddr = MyConfiguration.GetValue<string>("HostAddress");
+            hostingHttpPort = MyConfiguration.GetValue<string>("HostHttpPort");
+            hostingTcpPost = MyConfiguration.GetValue<string>("HostTcpPort");
+
             try
             {
-                IPAddress address = IPAddress.Parse(args[0]);
+
+                IPAddress address = IPAddress.Parse(hostingIPAddr);
+                int httpPort = int.Parse(hostingHttpPort);
+                int tcpPort= int.Parse(hostingTcpPost);
+
                 var host = WebHost.CreateDefaultBuilder();
 
                 host.UseKestrel(option =>
                 {
                     option.AllowSynchronousIO = true;
-                    //option.Listen(address, 9110);
-                    option.Listen(IPAddress.Parse("172.20.105.36"), 9110);
+                    option.Listen(address, httpPort);
                 });
-                //host.UseNetTcp(address, 9120);
-                host.UseNetTcp(IPAddress.Parse("172.20.105.36"), 9120);
+                
+                host.UseNetTcp(address, tcpPort);
                 host.UseStartup<StartupDBService>();
-
                 return host;
 
             }

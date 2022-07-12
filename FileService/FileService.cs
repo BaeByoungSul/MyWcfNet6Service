@@ -16,11 +16,13 @@ namespace BBS.WCF
 
         //private string serverPath = ConfigurationManager.AppSettings.Get("ServerFolder");
 
-        private string ServerFolder { get; set; } = string.Empty;
+        private string? ServerFolder { get; set; } = string.Empty;
 
         public FileService()
         {
-            ServerFolder = ConfigurationManager.AppSettings.Get("ServerFolder") ?? string.Empty;
+            ServerFolder = Program.MyConfiguration?.GetSection("ServerFolder").Value;
+            if (ServerFolder == null) throw new Exception("Server Folder Error");
+            
             Console.WriteLine("File Service Created...{0}, {1}", GetClientAddress(), DateTime.Now);
         }
         private string? GetClientAddress()
@@ -47,6 +49,8 @@ namespace BBS.WCF
         {
             try
             {
+                if (ServerFolder == null) throw new Exception("Server Folder Error");
+
                 string filePath = Path.Combine(ServerFolder, reqFile.FileName);
 
                 FileStream? stream = null;
@@ -95,6 +99,7 @@ namespace BBS.WCF
             {
                 //if (uploadFile == null) throw new Exception("FileData is null error ");
                 if (uploadFile.MyStream == null) throw new Exception("FileData is null error ");
+                if (ServerFolder == null) throw new Exception("Server Folder Error");
 
                 // 서버 파일경로 + 파일명
                 string filePath = Path.Combine(ServerFolder, uploadFile.FileName);
@@ -137,6 +142,7 @@ namespace BBS.WCF
         {
             try
             {
+                if (ServerFolder == null) throw new Exception("Server Folder Error");
 
                 // 서버 파일경로 + 파일명
                 string filePath = Path.Combine(ServerFolder, fileName);
