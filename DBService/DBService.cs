@@ -248,11 +248,12 @@ public class DBFillManager
     {
         try
         {
-            string strSection = "MyConnectionStrings:"+myCmd.ConnectionName;
 
-            if (Program.MyConfiguration == null) throw new Exception("Configuration Error ");
+            string strSection = "MyConnectionStrings:"+myCmd.ConnectionName;
+            if (Program.MyConfiguration == null) throw new Exception("DB ConnectName Value Error ");
 
             ConnectValue = Program.MyConfiguration.GetSection(strSection).Get<ConnectDB>();
+            if (ConnectValue == null) throw new Exception("DB Connect Setting Value Error ");
             
             // Create DB Connection 
             DbConn = MyDbStatic.CreateConnection(ConnectValue) ?? throw new Exception("Db Connection Error ");
